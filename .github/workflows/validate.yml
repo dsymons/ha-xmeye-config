@@ -31,6 +31,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-      - run: sudo apt-get update && sudo apt-get install -y libturbojpeg0
+      - run: sudo apt-get update && (sudo apt-get install -y libturbojpeg || sudo apt-get install -y libturbojpeg0)
       - run: pip install -r requirements_test.txt
       - run: pytest tests -q --allow-hosts=127.0.0.1,127.0.0.2
