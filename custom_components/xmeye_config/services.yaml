@@ -1,0 +1,35 @@
+get_config:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: xmeye_config
+    name:
+      required: true
+      example: Simplify.Encode
+      selector:
+        text:
+    kind:
+      default: config
+      selector:
+        select:
+          options:
+            - config
+            - ability
+set_config:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: xmeye_config
+    name:
+      required: true
+      example: NetWork.Nat
+      selector:
+        text:
+    data:
+      required: true
+      selector:
+        object:

@@ -1,0 +1,121 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add an XMEye / Xiongmai camera",
+        "menu_options": {
+          "search": "Search the network",
+          "manual": "Enter address manually"
+        }
+      },
+      "search": {
+        "title": "Search for cameras",
+        "description": "Searches the network Home Assistant is on. To also check another VLAN or subnet, enter it below (for example 192.168.6.0/24).",
+        "data": {
+          "subnet": "Extra subnet to scan (optional)"
+        }
+      },
+      "pick": {
+        "title": "Cameras found",
+        "description": "Found {count} camera(s) not yet added.",
+        "data": {
+          "camera": "Camera"
+        }
+      },
+      "credentials": {
+        "title": "Log in to {host}",
+        "description": "Leave the password blank if the camera has none.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "discovery_confirm": {
+        "title": "Set up camera at {host}",
+        "description": "Home Assistant found this Xiongmai camera. Enter its login to add it.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "manual": {
+        "title": "Camera address",
+        "description": "Connects to the camera's DVRIP port (usually 34567). Leave the password blank if the camera has none.",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Change connection",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "reconfigure_auth": {
+        "title": "Camera login rejected",
+        "description": "Enter the camera's current username and password.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to the camera on that host and port.",
+      "invalid_auth": "The camera rejected the username or password.",
+      "no_devices_found": "No new cameras found. Check the subnet, or enter the address manually.",
+      "invalid_subnet": "Enter a subnet like 192.168.6.0/24 (up to 1024 addresses)."
+    },
+    "abort": {
+      "already_configured": "This camera is already set up.",
+      "reconfigure_successful": "Connection updated.",
+      "reauth_successful": "Login updated.",
+      "already_in_progress": "This camera is already being set up."
+    },
+    "flow_title": "{name}"
+  },
+  "services": {
+    "get_config": {
+      "name": "Get camera config",
+      "description": "Read a raw configuration section (e.g. Simplify.Encode) or capability (e.g. EncodeCapability) from the camera.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Camera",
+          "description": "The camera to query."
+        },
+        "name": {
+          "name": "Section",
+          "description": "Config or capability name, e.g. AVEnc.VideoWidget."
+        },
+        "kind": {
+          "name": "Kind",
+          "description": "config for settings, ability for capabilities."
+        }
+      }
+    },
+    "set_config": {
+      "name": "Set camera config",
+      "description": "Write a whole raw configuration section. Read it with Get camera config first and send back the edited value.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Camera",
+          "description": "The camera to change."
+        },
+        "name": {
+          "name": "Section",
+          "description": "Config name, e.g. Camera.Param.[0]."
+        },
+        "data": {
+          "name": "Data",
+          "description": "The full section value to write."
+        }
+      }
+    }
+  }
+}

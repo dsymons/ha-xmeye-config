@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check manifest version matches the tag
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          VERSION=$(python3 -c "import json;print(json.load(open('custom_components/xmeye_config/manifest.json'))['version'])")
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match manifest version $VERSION"
+            exit 1
+          fi
+      - name: Zip the integration
+        run: cd custom_components/xmeye_config && zip -r ../../xmeye_config.zip . -x '__pycache__/*'
+      - name: Attach to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" xmeye_config.zip --clobber
