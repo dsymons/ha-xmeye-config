@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+- Subnet search no longer tries to log in to each device. Those failed logins could make a camera with a password lock out logins for a while.
+- Clearer login errors when adding a camera: wrong password, unknown username, or camera temporarily locked after failed attempts. The camera's own reason is also written to the Home Assistant log.
+
 ## 0.4.0
 - Preview camera on each device: a still image from the camera so you can tell cameras apart, refreshed at most every 10 seconds. Uses the camera's own snapshot command, falling back to a frame from the RTSP substream. Opening it gives the live substream.
 - New cameras are named after the camera's own name (e.g. "Front drive (192.168.1.20)") instead of the chip model.

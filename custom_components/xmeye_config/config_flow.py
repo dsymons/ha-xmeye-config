@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Mapping
 from typing import Any
 
@@ -17,6 +18,7 @@ from .const import DEFAULT_PORT, DEFAULT_USERNAME, DOMAIN
 from .discovery import FoundCamera, broadcast_search, sweep_subnet
 from .dvrip import DVRIPAuthError, DVRIPClient, DVRIPError
 
+_LOGGER = logging.getLogger(__name__)
 CONF_SUBNET = "subnet"
 CONF_CAMERA = "camera"
 
@@ -66,9 +68,15 @@ class XMEyeConfigFlow(ConfigFlow, domain=DOMAIN):
     async def _check(self, data: dict[str, Any]) -> tuple[dict[str, str], dict[str, Any]]:
         try:
             return {}, await _probe(data)
-        except DVRIPAuthError:
+        except DVRIPAuthError as err:
+            _LOGGER.warning("%s:%s refused login: %s", data[CONF_HOST], data[CONF_PORT], err)
+            if err.locked:
+                return {"base": "locked"}, {}
+            if err.ret == 204:
+                return {"base": "unknown_user"}, {}
             return {"base": "invalid_auth"}, {}
-        except DVRIPError:
+        except DVRIPError as err:
+            _LOGGER.warning("Cannot set up %s:%s: %s", data[CONF_HOST], data[CONF_PORT], err)
             return {"base": "cannot_connect"}, {}
 
     async def _create(self, data: dict[str, Any], info: dict[str, Any]) -> ConfigFlowResult:

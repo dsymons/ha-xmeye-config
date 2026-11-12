@@ -39,16 +39,16 @@ async def test_broadcast_protocol():
                                  name="LocalHost", method="broadcast")]
 
 
-async def test_sweep_finds_dvrip_only():
+async def test_sweep_never_logs_in():
     cam = await FakeCamera().start()
-    other = await asyncio.start_server(lambda r, w: w.close(), "127.0.0.1", 0)  # non-DVRIP port
     try:
         assert [c.host for c in await sweep_subnet("127.0.0.1/32", port=cam.port)] == ["127.0.0.1"]
-        assert await sweep_subnet("127.0.0.1/32", port=other.sockets[0].getsockname()[1]) == []
+        assert cam.log == []  # no login attempt, so no lock-out risk
+        assert await sweep_subnet("127.0.0.1/32", port=1) == []
         with pytest.raises(ValueError):
             await sweep_subnet("10.0.0.0/16")
     finally:
-        await cam.stop(); other.close()
+        await cam.stop()
 
 
 async def test_search_flow(hass: HomeAssistant):

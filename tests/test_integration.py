@@ -244,3 +244,16 @@ async def test_preview_falls_back_to_rtsp(hass: HomeAssistant):
         assert "stream=1.sdp" in ff.call_args.args[1] and ":554/" in ff.call_args.args[1]
     finally:
         await cam.stop()
+
+
+@pytest.mark.parametrize(("ret", "error"), [(205, "locked"), (204, "unknown_user"), (203, "invalid_auth")])
+async def test_login_errors_are_specific(hass: HomeAssistant, ret, error):
+    cam = await FakeCamera(login_ret=ret).start()
+    try:
+        r = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
+        r = await hass.config_entries.flow.async_configure(r["flow_id"], {"next_step_id": "manual"})
+        r = await hass.config_entries.flow.async_configure(r["flow_id"],
+            {"host": "127.0.0.1", "port": cam.port, "username": "admin", "password": ""})
+        assert r["errors"] == {"base": error}
+    finally:
+        await cam.stop()

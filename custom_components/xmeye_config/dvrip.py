@@ -30,6 +30,7 @@ CHANNEL_TITLE_SET = 1046
 CHANNEL_TITLE_GET = 1048
 
 OK_CODES = (100, 150, 515)
+AUTH_CODES = (106, 203, 204, 205, 206, 207)
 
 RET_MESSAGES = {
     101: "Unknown error",
@@ -40,7 +41,10 @@ RET_MESSAGES = {
     117: "Message format error",
     150: "Operation successful, device restart required",
     203: "Password is incorrect",
-    205: "IP locked",
+    204: "User does not exist",
+    205: "Login locked after too many failed attempts",
+    206: "User is blacklisted",
+    207: "Address is blacklisted",
     502: "Command is invalid",
     603: "System restart required",
     605: "Feature not supported",
@@ -54,7 +58,15 @@ class DVRIPError(Exception):
 
 
 class DVRIPAuthError(DVRIPError):
-    """Login rejected."""
+    """Login rejected. ret is the camera's code (203 wrong password, 205 IP locked...)."""
+
+    def __init__(self, ret: int | None) -> None:
+        self.ret = ret
+        super().__init__(f"Login refused: {RET_MESSAGES.get(ret, 'unknown reason')} ({ret})")
+
+    @property
+    def locked(self) -> bool:
+        return self.ret in (205, 206, 207)
 
 
 class DVRIPCommandError(DVRIPError):
@@ -132,8 +144,8 @@ class DVRIPSession:
         })
         ret = reply.get("Ret")
         if ret not in OK_CODES:
-            if ret in (106, 203, 204, 205, 206):
-                raise DVRIPAuthError(RET_MESSAGES.get(ret, f"Login refused ({ret})"))
+            if ret in AUTH_CODES:
+                raise DVRIPAuthError(ret)
             raise DVRIPCommandError("Login", ret)
         self._session = int(reply["SessionID"], 16)
         return reply

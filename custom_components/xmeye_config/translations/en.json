@@ -68,9 +68,11 @@
     },
     "error": {
       "cannot_connect": "Could not connect to the camera on that host and port.",
-      "invalid_auth": "The camera rejected the username or password.",
+      "invalid_auth": "The camera says the password is wrong. If you've never set one, leave it blank.",
       "no_devices_found": "No new cameras found. Check the subnet, or enter the address manually.",
-      "invalid_subnet": "Enter a subnet like 192.168.6.0/24 (up to 1024 addresses)."
+      "invalid_subnet": "Enter a subnet like 192.168.6.0/24 (up to 1024 addresses).",
+      "locked": "The camera has locked out logins after too many failed attempts. Wait about 30 minutes, or reboot the camera, then try again with the correct password.",
+      "unknown_user": "That username doesn't exist on the camera (it's usually admin)."
     },
     "abort": {
       "already_configured": "This camera is already set up.",

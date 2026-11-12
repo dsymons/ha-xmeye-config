@@ -3,8 +3,8 @@
 Two methods:
 - broadcast: the cameras' own search protocol (UDP 34569, msg 1530/1531). Fast
   and returns MAC/hostname, but only reaches the network Home Assistant is on.
-- sweep: try TCP 34567 on every address in a subnet and confirm the device
-  answers DVRIP. Works across VLANs as long as routing/firewall allow it.
+- sweep: try TCP 34567 on every address in a subnet (no login, so it can't
+  trigger a camera's failed-login lock-out). Works across VLANs as long as routing/firewall allow it.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ import struct
 from dataclasses import dataclass
 
 from .catalog import _hex_ip
-from .dvrip import HEADER, sofia_hash
+from .dvrip import HEADER
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -88,22 +88,17 @@ async def broadcast_search(timeout: float = 3.0, target: str = "255.255.255.255"
 
 
 async def _probe(host: str, port: int, timeout: float) -> bool:
-    """True if host:port answers a DVRIP login (even with a refusal)."""
+    """True if host accepts a TCP connection on the DVRIP port.
+
+    Deliberately no login attempt: failed logins count towards the camera's
+    lock-out, and a sweep would hit every camera with the wrong password.
+    """
     try:
-        reader, writer = await asyncio.wait_for(asyncio.open_connection(host, port), timeout)
+        _, writer = await asyncio.wait_for(asyncio.open_connection(host, port), timeout)
     except (OSError, asyncio.TimeoutError):
         return False
-    try:
-        body = json.dumps({"EncryptType": "MD5", "LoginType": "DVRIP-Web",
-                           "PassWord": sofia_hash(""), "UserName": "admin"}).encode()
-        writer.write(HEADER.pack(255, 0, 0, 0, 1000, len(body) + 2) + body + b"\x0a\x00")
-        await writer.drain()
-        head = await asyncio.wait_for(reader.readexactly(HEADER.size), timeout)
-        return head[0] == 255  # any DVRIP reply, accepted or refused
-    except (OSError, asyncio.TimeoutError, asyncio.IncompleteReadError):
-        return False
-    finally:
-        writer.close()
+    writer.close()
+    return True
 
 
 async def sweep_subnet(subnet: str, port: int = 34567, timeout: float = 1.5,

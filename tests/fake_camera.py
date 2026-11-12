@@ -66,7 +66,8 @@ FAKE_JPEG = b"\xff\xd8\xff\xe0" + b"fake-image-data" * 4 + b"\xff\xd9"
 SYSINFO = {"HardWare": "IPC_GK7205V300_S38", "SerialNo": "abc123def456", "SoftWareVersion": "V5.00.R02"}
 
 class FakeCamera:
-    def __init__(self, password_hash=PASSWORD_HASH, missing=(), model="full"):
+    def __init__(self, password_hash=PASSWORD_HASH, missing=(), model="full", login_ret=None):
+        self.login_ret = login_ret
         self.config = copy.deepcopy({"full": FULL, "basic": CONFIG, "sparse2": SPARSE2}[model])
         self.channels = 2 if model == "sparse2" else 1
         self.titles = ["Robot"] if model == "full" else None
@@ -96,7 +97,9 @@ class FakeCamera:
                 name = body.get("Name")
                 self.log.append((msg, name))
                 if msg == 1000:
-                    if body["PassWord"] != self.password_hash:
+                    if self.login_ret:
+                        reply = {"Ret": self.login_ret, "SessionID": "0x00000000"}
+                    elif body["PassWord"] != self.password_hash:
                         reply = {"Ret": 203, "SessionID": "0x00000000"}
                     else:
                         session = 0x1A; reply = {"Ret": 100, "SessionID": "0x0000001A",
