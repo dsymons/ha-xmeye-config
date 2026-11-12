@@ -89,3 +89,7 @@ to `catalog.py`.
 ## Tests
 `pip install -r requirements_test.txt && pytest tests` runs against simulated cameras: a full-featured single-channel
 model, a basic one, and a sparse two-channel one.
+
+## Credits
+The DVRIP protocol details come from [OpenIPC/python-dvr](https://github.com/OpenIPC/python-dvr)
+(MIT licence, © 2017 Eliot Kent Woodrich).
