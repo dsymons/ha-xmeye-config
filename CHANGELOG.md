@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.1
+- Integration icon (shown on Home Assistant 2026.3 and later).
+
 ## 0.3.0
 - Search the network for cameras when adding one, with an optional subnet sweep for cameras on another VLAN.
 - Background broadcast discovery every 30 minutes; new cameras appear under Discovered.

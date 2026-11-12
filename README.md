@@ -1,5 +1,7 @@
 # XMEye Camera Config
 
+<img src="custom_components/xmeye_config/brand/icon.png" width="96" alt="">
+
 Home Assistant integration for configuring Xiongmai-based cameras (XMEye, iCSee,
 NetSurveillance, "VideoPlayTool" web viewer) locally over the DVRIP protocol on
 port 34567. No plugin, cloud account or extra Python packages needed.

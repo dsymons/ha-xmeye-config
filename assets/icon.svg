@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+ <defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0" stop-color="#2D8CF0"/><stop offset="1" stop-color="#1557B8"/>
+  </linearGradient>
+ </defs>
+ <rect x="16" y="16" width="480" height="480" rx="104" fill="url(#bg)"/>
+ <!-- wall mount -->
+ <rect x="368" y="96" width="36" height="120" rx="12" fill="#DCE9FA"/>
+ <path d="M300 214 L386 156" stroke="#DCE9FA" stroke-width="30" stroke-linecap="round"/>
+ <!-- camera body -->
+ <g transform="rotate(-14 230 200)">
+  <rect x="96" y="150" width="236" height="104" rx="30" fill="#FFFFFF"/>
+  <rect x="80" y="138" width="70" height="128" rx="20" fill="#FFFFFF"/>
+  <circle cx="120" cy="202" r="34" fill="#13305C"/>
+  <circle cx="120" cy="202" r="18" fill="#2D8CF0"/>
+  <circle cx="112" cy="194" r="6" fill="#FFFFFF" opacity="0.9"/>
+  <rect x="190" y="182" width="110" height="12" rx="6" fill="#C7DAF3"/>
+  <rect x="190" y="208" width="80" height="12" rx="6" fill="#C7DAF3"/>
+ </g>
+ <!-- settings gear -->
+ <circle cx="372" cy="368" r="106" fill="#1557B8"/>
+ <path d="M372.0,296.0 L389.9,277.8 L407.2,283.0 L412.0,308.1 L422.9,317.1 L448.5,316.9 L457.0,332.8 L442.6,354.0 L444.0,368.0 L462.2,385.9 L457.0,403.2 L431.9,408.0 L422.9,418.9 L423.1,444.5 L407.2,453.0 L386.0,438.6 L372.0,440.0 L354.1,458.2 L336.8,453.0 L332.0,427.9 L321.1,418.9 L295.5,419.1 L287.0,403.2 L301.4,382.0 L300.0,368.0 L281.8,350.1 L287.0,332.8 L312.1,328.0 L321.1,317.1 L320.9,291.5 L336.8,283.0 L358.0,297.4 Z" fill="#FFB020"/>
+ <circle cx="372" cy="368" r="30" fill="#1557B8"/>
+</svg>
