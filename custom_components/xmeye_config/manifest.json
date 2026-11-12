@@ -5,10 +5,13 @@
     "@dsymons"
   ],
   "config_flow": true,
+  "dependencies": [
+    "ffmpeg"
+  ],
   "documentation": "https://github.com/dsymons/ha-xmeye-config",
   "integration_type": "device",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/dsymons/ha-xmeye-config/issues",
   "requirements": [],
-  "version": "0.3.1"
+  "version": "0.4.0"
 }

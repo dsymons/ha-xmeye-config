@@ -49,6 +49,7 @@ FULL = dict(CONFIG, **{
  "NetWork.NetIPFilter": {"Banned": ["0x00000000"] * 4, "Enable": False, "Trusted": ["0x00000000"] * 4},
  "General.AutoMaintain": {"AutoDeleteFilesDays": 0, "AutoRebootDay": "Tuesday", "AutoRebootHour": 3},
  "Camera": {"Param": [PARAM]},
+ "NetWork.RTSP": {"IsUseRtsp": True, "Port": 8554},
 })
 SPARSE2 = {  # two-channel device with few sections and an odd day/night value
  "Simplify.Encode": CONFIG["Simplify.Encode"] * 2,
@@ -61,6 +62,7 @@ SPARSE2 = {  # two-channel device with few sections and an odd day/night value
 ABILITY = {"EncodeCapability": {"EncodeInfo": [
     {"StreamType": "MainStream", "ResolutionMask": hex((1<<11)|(1<<14)|(1<<18))},
     {"StreamType": "ExtraStream", "ResolutionMask": hex(1|(1<<5))}]}}
+FAKE_JPEG = b"\xff\xd8\xff\xe0" + b"fake-image-data" * 4 + b"\xff\xd9"
 SYSINFO = {"HardWare": "IPC_GK7205V300_S38", "SerialNo": "abc123def456", "SoftWareVersion": "V5.00.R02"}
 
 class FakeCamera:
@@ -72,6 +74,8 @@ class FakeCamera:
         self.password_hash = password_hash
         self.log = []
         self.time = None
+        self.snaps = 0
+        self.snapshot_support = model == "full"
         self.rebooted = False
 
     async def start(self):
@@ -117,6 +121,16 @@ class FakeCamera:
                     if name not in self.config: reply = {"Ret": 607}
                     else:
                         self.config[name] = body[name]; reply = {"Ret": 100, "Name": name}
+                elif msg == 1560:
+                    self.snaps += 1
+                    if self.snapshot_support:
+                        jpeg = FAKE_JPEG
+                        first = b"\x00\x00\x01\xfe" + bytes(8) + struct.pack("<I", len(jpeg)) + jpeg[:10]
+                        for part in (first, jpeg[10:]):
+                            w.write(HEADER.pack(255, 0, session, seq, 1561, len(part)) + part)
+                        await w.drain()
+                        continue
+                    reply = {"Ret": 605, "Name": "OPSNAP"}
                 elif msg == 1450 and name == "OPMachine":
                     self.rebooted = True; break
                 elif msg == 1450 and name == "OPTimeSetting":

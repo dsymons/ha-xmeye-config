@@ -25,7 +25,14 @@ async def _probe(data: Mapping[str, Any]) -> dict[str, Any]:
     client = DVRIPClient(data[CONF_HOST], data[CONF_PORT], data[CONF_USERNAME],
                          data.get(CONF_PASSWORD, ""))
     async with client.session() as s:
-        return await s.get_system_info()
+        info = dict(await s.get_system_info())
+        try:
+            titles = await s.get_channel_titles()
+            if titles and isinstance(titles[0], str) and titles[0].strip():
+                info["_title"] = titles[0].strip()
+        except DVRIPError:
+            pass
+        return info
 
 
 def _schema(defaults: Mapping[str, Any]) -> vol.Schema:
@@ -68,7 +75,7 @@ class XMEyeConfigFlow(ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(info.get("SerialNo") or data[CONF_HOST],
                                        raise_on_progress=False)
         self._abort_if_unique_id_configured(updates=data)
-        title = info.get("HardWare") or "XMEye camera"
+        title = info.get("_title") or info.get("HardWare") or "XMEye camera"
         return self.async_create_entry(title=f"{title} ({data[CONF_HOST]})", data=data)
 
     # ---- user: search or manual ------------------------------------------------

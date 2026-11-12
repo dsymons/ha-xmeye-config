@@ -61,6 +61,7 @@ integration as above. Enter the camera IP, port 34567, `admin` and the password
 | Picture | brightness, contrast, saturation, hue*, flip, mirror, day/night mode, anti-flicker, backlight compensation, WDR + level, prevent overexposure, defog + level, exposure sensitivity and target, day/night noise reduction, day/night threshold*, IR-cut swap* |
 | Detection | camera motion detection + sensitivity, tamper detection + sensitivity |
 | Network | cloud connection (XMEye), UPnP, mobile service*, NTP sync + server, hostname, IP allow list + addresses; diagnostic sensors for IP, gateway, MAC, DHCP, netmask*, DNS*, ports* |
+| Preview | a camera entity showing a still from the camera (refreshed at most every 10 s), with the live substream when opened |
 | Maintenance | scheduled reboot day and hour, reboot button, set clock from Home Assistant |
 
 \* disabled by default; enable from the entity list if wanted.

@@ -25,7 +25,7 @@ from .const import ATTR_CONFIG_ENTRY, ATTR_DATA, ATTR_KIND, ATTR_NAME, DOMAIN
 from .coordinator import XMEyeConfigEntry, XMEyeCoordinator
 from .dvrip import DVRIPClient, DVRIPError
 
-PLATFORMS = [Platform.BUTTON, Platform.NUMBER, Platform.SELECT, Platform.SENSOR,
+PLATFORMS = [Platform.BUTTON, Platform.CAMERA, Platform.NUMBER, Platform.SELECT, Platform.SENSOR,
              Platform.SWITCH, Platform.TEXT]
 DISCOVERY_INTERVAL = timedelta(minutes=30)
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)

@@ -50,6 +50,7 @@ SECTIONS: dict[str, Section] = {
     "mobile": Section("NetWork.NetMobile"),
     "ipfilter": Section("NetWork.NetIPFilter"),
     "location": Section("General.Location"),
+    "rtsp": Section("NetWork.RTSP"),
     "maintain": Section("General.AutoMaintain"),
 }
 
@@ -57,7 +58,7 @@ SECTIONS: dict[str, Section] = {
 EXTRA_DIAGNOSTIC_SECTIONS = [
     "Camera", "General.General", "fVideo.OSDInfo", "fVideo.Volume",
     "fVideo.AudioInFormat", "NetWork.ChnStatus", "NetWork.DigTimeSyn",
-    "NetWork.NetDDNS", "NetWork.NetEmail", "NetWork.NetFTP", "NetWork.RTSP",
+    "NetWork.NetDDNS", "NetWork.NetEmail", "NetWork.NetFTP",
     "NetWork.OnvifPwdCheckout", "Storage.Snapshot", "Uart.PTZ", "Alarm.LocalAlarm",
     "Detect.HumanDetection", "AVEnc.SmartH264V2.[0]", "Camera.WhiteLight",
 ]

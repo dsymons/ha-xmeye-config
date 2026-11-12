@@ -24,6 +24,8 @@ CONFIG_GET = 1042
 ABILITY_GET = 1360
 OP_MACHINE = 1450
 OP_TIME_SETTING = 1450
+OP_SNAP = 1560
+MAX_SNAPSHOT_BYTES = 8 * 1024 * 1024
 CHANNEL_TITLE_SET = 1046
 CHANNEL_TITLE_GET = 1048
 
@@ -170,6 +172,40 @@ class DVRIPSession:
         })
         if reply.get("Ret") not in OK_CODES:
             raise DVRIPCommandError("ChannelTitle", reply.get("Ret"))
+
+    async def snapshot(self, channel: int = 0) -> bytes:
+        """Ask the camera for a JPEG still (OPSNAP). Raises DVRIPError if unsupported."""
+        body = json.dumps({"Name": "OPSNAP", "SessionID": self.session_hex,
+                           "OPSNAP": {"Channel": channel}}).encode()
+        self._writer.write(HEADER.pack(255, 0, self._session, self._seq, OP_SNAP, len(body) + 2)
+                           + body + b"\x0a\x00")
+        self._seq += 1
+        buf = bytearray()
+        expected: int | None = None
+        try:
+            await asyncio.wait_for(self._writer.drain(), self._timeout)
+            while True:
+                head = await asyncio.wait_for(self._reader.readexactly(HEADER.size), self._timeout)
+                length = HEADER.unpack(head)[5]
+                packet = await asyncio.wait_for(self._reader.readexactly(length), self._timeout)
+                if not buf and expected is None:
+                    if packet[:1] == b"{":
+                        reply = _decode(packet)
+                        raise DVRIPCommandError("OPSNAP", reply.get("Ret"))
+                    if packet[:4] == b"\x00\x00\x01\xfe":   # media frame header + JPEG
+                        expected = struct.unpack("<I", packet[12:16])[0]
+                        packet = packet[16:]
+                    elif packet[:2] != b"\xff\xd8":
+                        raise DVRIPError("Unexpected snapshot data from camera")
+                buf.extend(packet)
+                if len(buf) > MAX_SNAPSHOT_BYTES:
+                    raise DVRIPError("Snapshot too large")
+                if expected is not None and len(buf) >= expected:
+                    return bytes(buf[:expected])
+                if expected is None and buf.endswith(b"\xff\xd9"):
+                    return bytes(buf)
+        except (asyncio.TimeoutError, asyncio.IncompleteReadError, OSError) as err:
+            raise DVRIPError(f"Snapshot failed: {err!r}") from err
 
     async def reboot(self) -> None:
         body = {"Name": "OPMachine", "SessionID": self.session_hex,

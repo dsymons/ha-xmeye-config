@@ -45,7 +45,7 @@ async def test_config_flow(hass: HomeAssistant, cam):
         {"host": "127.0.0.1", "port": cam.port, "username": "admin", "password": ""})
     assert r["type"] is FlowResultType.CREATE_ENTRY
     assert r["result"].unique_id == "abc123def456"
-    assert r["title"] == "IPC_GK7205V300_S38 (127.0.0.1)"
+    assert r["title"] == "Robot (127.0.0.1)"
     await hass.async_block_till_done()
 
 
@@ -216,3 +216,31 @@ async def test_diagnostics(hass: HomeAssistant, cam):
     assert d["entry"]["password"] in ("", "**REDACTED**")  # HA leaves empty values as-is
     assert d["extra_sections"]["Camera"]["Param"][0]["AeSensitivity"] == 5
     assert d["abilities"]["SystemFunction"].startswith("unavailable")
+
+
+async def test_preview_snapshot_dvrip(hass: HomeAssistant, cam):
+    from homeassistant.components.camera import async_get_image as cam_image
+    from .fake_camera import FAKE_JPEG
+    await setup(hass, cam)
+    ent = eid(hass, "preview", "camera")
+    img = await cam_image(hass, ent)
+    assert img.content == FAKE_JPEG
+    await cam_image(hass, ent)
+    assert cam.snaps == 1  # cached between UI refreshes
+    cam_ent = hass.data["camera"].get_entity(ent)
+    src = await cam_ent.stream_source()
+    assert src == f"rtsp://127.0.0.1:8554/user=admin&password=&channel=1&stream=1.sdp?real_stream"
+
+
+async def test_preview_falls_back_to_rtsp(hass: HomeAssistant):
+    from homeassistant.components.camera import async_get_image as cam_image
+    cam = await FakeCamera(model="basic").start()
+    try:
+        await setup(hass, cam, password="")
+        with patch("custom_components.xmeye_config.camera.async_get_image",
+                   return_value=b"\xff\xd8rtsp\xff\xd9") as ff:
+            img = await cam_image(hass, eid(hass, "preview", "camera"))
+        assert img.content == b"\xff\xd8rtsp\xff\xd9"
+        assert "stream=1.sdp" in ff.call_args.args[1] and ":554/" in ff.call_args.args[1]
+    finally:
+        await cam.stop()

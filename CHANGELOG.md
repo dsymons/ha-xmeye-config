@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+- Preview camera on each device: a still image from the camera so you can tell cameras apart, refreshed at most every 10 seconds. Uses the camera's own snapshot command, falling back to a frame from the RTSP substream. Opening it gives the live substream.
+- New cameras are named after the camera's own name (e.g. "Front drive (192.168.1.20)") instead of the chip model.
+
 ## 0.3.1
 - Integration icon (shown on Home Assistant 2026.3 and later).
 
